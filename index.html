@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            /* background: linear-gradient(to right, rgb(234, 124, 142), rgb(222, 30, 30)); */
+            background-image: url(images/background.jpg);
+            /* background-repeat: no-repeat; */
+            /* background-size: cover; */
+            /* height: 100vh; */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        audio {
+            margin: 20px;
+            width: 500px;
+            height: 50px;
+        }
+        button {
+            margin: 5px;
+            border-radius: 20px;
+            background-color: brown;
+            color: antiquewhite;
+            border: solid 1px brown;
+            height: 50px;
+            width: 100px;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+        input[type="range"] {
+            margin-top: 20px;
+            width: 300px;
+        }
+        #trackDuration {
+            color: white;
+            margin-top: 10px;
+        }
+        p{
+            color: white;
+        }
+        label{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cocomelon Tunes</h1>
+    <audio id="audio" controls></audio>
+    <br>
+    <p id="currentTrack"></p>
+    <p id="trackDuration"></p>
+   <label>Adjust Volume</label>
+    <input type="range" id="volumeSlider" min="0" max="100" value="100" onchange="changeVolume(this.value)">
+    
+    <button onclick="prevTrack()">Previous</button>
+    <button onclick="playPause()">Play/Pause</button>
+    <button onclick="nextTrack()">Next</button>
+    <button onclick="downloadTrack()">Download</button>
+
+    <script>
+        const tracks = [
+            {
+                name: "Track 1",
+                src: "audios/audio.mp3"
+            },
+            {
+                name: "Track 2",
+                src: "audios/audio1.mp3"
+            },
+            {
+                name: "Track 3",
+                src: "audios/audio2.mp3"
+            }
+        ];
+
+        let currentTrackIndex = 0;
+        const audio = document.getElementById('audio');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const currentTrackDisplay = document.getElementById('currentTrack');
+        const trackDurationDisplay = document.getElementById('trackDuration');
+
+        function loadTrack(index) {
+            audio.src = tracks[index].src;
+            audio.load();
+            audio.play();
+            currentTrackDisplay.innerText = `Now Playing: ${tracks[index].name}`;
+        }
+
+        function playPause() {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length;
+            loadTrack(currentTrackIndex);
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+            loadTrack(currentTrackIndex);
+        }
+
+        function changeVolume(volume) {
+            audio.volume = volume / 100;
+        }
+
+        function downloadTrack() {
+            const link = document.createElement('a');
+            link.href = tracks[currentTrackIndex].src;
+            link.download = tracks[currentTrackIndex].name + '.mp3';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Update track duration display when metadata is loaded
+        audio.addEventListener('loadedmetadata', function() {
+            const duration = formatTime(audio.duration);
+            trackDurationDisplay.innerText = `Duration: ${duration}`;
+        });
+
+        // Format time in MM:SS format
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        // Load the first track initially
+        loadTrack(currentTrackIndex);
+    </script>
+</body>
+</html>
